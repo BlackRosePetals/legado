@@ -1,12 +1,22 @@
 package io.legado.app.data.entities
 
 import android.os.Parcelable
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import io.legado.app.constant.AppPattern
 import io.legado.app.constant.BookType
 import io.legado.app.constant.PageAnim
 import io.legado.app.data.appDb
-import io.legado.app.help.book.*
+import io.legado.app.help.book.BookHelp
+import io.legado.app.help.book.ContentProcessor
+import io.legado.app.help.book.isEpub
+import io.legado.app.help.book.isImage
+import io.legado.app.help.book.isPdf
 import io.legado.app.help.config.AppConfig
 import io.legado.app.help.config.ReadBookConfig
 import io.legado.app.model.ReadBook
@@ -144,6 +154,10 @@ data class Book(
     @IgnoredOnParcel
     private var folderName: String? = null
 
+    @get:Ignore
+    @IgnoredOnParcel
+    val lastChapterIndex get() = totalChapterNum - 1
+
     fun getRealAuthor() = author.replace(AppPattern.authorRegex, "")
 
     fun getUnreadChapterNum() = max(totalChapterNum - durChapterIndex - 1, 0)
@@ -245,6 +259,14 @@ data class Book(
         return config.delTag and tag == tag
     }
 
+    fun addDelTag(tag: Long) {
+        config.delTag = config.delTag and tag
+    }
+
+    fun removeDelTag(tag: Long) {
+        config.delTag = config.delTag and tag.inv()
+    }
+
     fun getFolderName(): String {
         folderName?.let {
             return it
@@ -287,8 +309,24 @@ data class Book(
         newBook.durChapterIndex = BookHelp
             .getDurChapter(durChapterIndex, durChapterTitle, toc, totalChapterNum)
         newBook.durChapterTitle = toc[newBook.durChapterIndex].getDisplayTitle(
-            ContentProcessor.get(newBook.name, newBook.origin).getTitleReplaceRules()
+            ContentProcessor.get(newBook.name, newBook.origin).getTitleReplaceRules(),
+            getUseReplaceRule()
         )
+        newBook.durChapterPos = durChapterPos
+        newBook.durChapterTime = durChapterTime
+        newBook.group = group
+        newBook.order = order
+        newBook.customCoverUrl = customCoverUrl
+        newBook.customIntro = customIntro
+        newBook.customTag = customTag
+        newBook.canUpdate = canUpdate
+        newBook.readConfig = readConfig
+        return newBook
+    }
+
+    fun updateTo(newBook: Book): Book {
+        newBook.durChapterIndex = durChapterIndex
+        newBook.durChapterTitle = durChapterTitle
         newBook.durChapterPos = durChapterPos
         newBook.durChapterTime = durChapterTime
         newBook.group = group
@@ -323,6 +361,7 @@ data class Book(
         appDb.bookDao.delete(this)
     }
 
+    @Suppress("ConstPropertyName")
     companion object {
         const val hTag = 2L
         const val rubyTag = 4L

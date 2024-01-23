@@ -23,15 +23,23 @@ import io.legado.app.ui.book.read.page.entities.TextPage
 import io.legado.app.ui.book.read.page.entities.column.ImageColumn
 import io.legado.app.ui.book.read.page.entities.column.ReviewColumn
 import io.legado.app.ui.book.read.page.entities.column.TextColumn
-import io.legado.app.utils.*
+import io.legado.app.utils.RealPathUtil
+import io.legado.app.utils.dpToPx
+import io.legado.app.utils.isContentScheme
+import io.legado.app.utils.isPad
+import io.legado.app.utils.postEvent
+import io.legado.app.utils.spToPx
+import io.legado.app.utils.splitNotBlank
+import io.legado.app.utils.textHeight
+import io.legado.app.utils.toStringArray
 import splitties.init.appCtx
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.LinkedList
+import java.util.Locale
 
 /**
  * 解析内容生成章节和页面
  */
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION", "ConstPropertyName")
 object ChapterProvider {
     //用于图片字的替换
     private const val srcReplaceChar = "▩"
@@ -372,9 +380,9 @@ object ChapterProvider {
                         textLayoutHeight = fistLine.lineTop - titleTopSpacing
                     }
                     textPage.lines.forEach {
-                        it.lineTop = it.lineTop - textLayoutHeight
-                        it.lineBase = it.lineBase - textLayoutHeight
-                        it.lineBottom = it.lineBottom - textLayoutHeight
+                        it.lineTop -= textLayoutHeight
+                        it.lineBase -= textLayoutHeight
+                        it.lineBottom -= textLayoutHeight
                     }
                     y - textLayoutHeight
                 }
@@ -627,15 +635,18 @@ object ChapterProvider {
         textPaint: TextPaint
     ): Pair<List<String>, List<Float>> {
         val charArray = text.toCharArray()
-        val strList = ArrayList<String>()
-        val textWidthList = ArrayList<Float>()
+        val strList = ArrayList<String>(text.length)
+        val textWidthList = ArrayList<Float>(text.length)
         val lastIndex = charArray.lastIndex
+        var ca: CharArray? = null
         for (i in textWidths.indices) {
             if (charArray[i].isLowSurrogate()) {
                 continue
             }
             val char = if (i + 1 <= lastIndex && charArray[i + 1].isLowSurrogate()) {
-                charArray[i].toString() + charArray[i + 1].toString()
+                if (ca == null) ca = CharArray(2)
+                System.arraycopy(charArray, i, ca, 0, 2)
+                String(ca)
             } else {
                 charArray[i].toString()
             }
@@ -705,8 +716,8 @@ object ChapterProvider {
             for (i in 0..words.lastIndex) {
                 textLine.getColumnReverseAt(i).let {
                     val py = cc * (words.size - i)
-                    it.start = it.start - py
-                    it.end = it.end - py
+                    it.start -= py
+                    it.end -= py
                 }
             }
         }

@@ -732,6 +732,8 @@
     <string name="import_old_summary">Select a legacy backup folder</string>
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
+    <string name="enabled_explore">Discovery Enabled</string>
+    <string name="disabled_explore">Discovery Disabled</string>
     <string name="starting_download">Starting download</string>
     <string name="already_in_download">This book is already in Download list</string>
     <string name="click_to_open">Click to open</string>
@@ -1120,8 +1122,6 @@
     <string name="test">测试</string>
     <string name="show_wait_up_count">显示等待更新数量</string>
     <string name="exit_app">退出软件</string>
-    <string name="add_all_to_bookshelf">全部加入书架</string>
-    <string name="page_to">页至</string>
     <string name="result_analyzed">Analyzed</string>
     <string name="bookshelf_px_4">Comprehensive</string>
     <string name="effective_replaces">起效的替换</string>
@@ -1137,4 +1137,11 @@
     <string name="keep_enable">保留启用状态</string>
     <string name="preview_image_by_click">点击预览图片</string>
     <string name="screen_portrait_reversed">反向竖屏</string>
+    <string name="del_ruby_tag">删除ruby标签</string>
+    <string name="del_h_tag">删除h标签</string>
+    <string name="adjust_chapter_page">调整本章页数</string>
+    <string name="adjust_chapter_index">调整章节位置</string>
+    <string name="clear_webview_data_success">清除成功，3秒后自动重启应用</string>
+    <string name="key_page_on_long_press">按键长按翻页</string>
+    <string name="save_log">保存日志</string>
 </resources>

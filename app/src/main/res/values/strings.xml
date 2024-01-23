@@ -734,6 +734,8 @@
     <string name="import_old_summary">Select a legacy backup folder</string>
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
+    <string name="enabled_explore">Discovery Enabled</string>
+    <string name="disabled_explore">Discovery Disabled</string>
     <string name="starting_download">Starting download</string>
     <string name="already_in_download">This book is already in Download list</string>
     <string name="click_to_open">Click to open</string>
@@ -905,7 +907,7 @@
     <string name="disable_source">disable source</string>
     <string name="delete_source">delete source</string>
     <string name="chapter_pay">pay</string>
-    <string name="double_page_horizontal">Flat/Landscape Dual Page</string>
+    <string name="double_page_horizontal">Tablet/Landscape Dual Page</string>
     <string name="open_in_browser">open in browser</string>
     <string name="copy_url">copy url</string>
     <string name="open_fun">open function</string>
@@ -1120,8 +1122,6 @@
     <string name="test">Test</string>
     <string name="show_wait_up_count">Display the number of pending updates</string>
     <string name="exit_app">Exit</string>
-    <string name="add_all_to_bookshelf">全部加入书架</string>
-    <string name="page_to">页至</string>
     <string name="result_analyzed">Analyzed</string>
     <string name="bookshelf_px_4">Comprehensive</string>
     <string name="effective_replaces">Effective replacement</string>
@@ -1137,4 +1137,11 @@
     <string name="preview_image_by_click">Click to preview image</string>
     <string name="default_home_page">Default HomePage</string>
     <string name="screen_portrait_reversed">Portrait Reversed</string>
+    <string name="del_ruby_tag">Delete ruby tag</string>
+    <string name="del_h_tag">Delete h tag</string>
+    <string name="adjust_chapter_page">Adjust of chapter page</string>
+    <string name="adjust_chapter_index">Adjust of chapter index</string>
+    <string name="clear_webview_data_success">Cleared successfully, automatically restarts the application after 3 seconds</string>
+    <string name="key_page_on_long_press">Press and hold the key to turn the page</string>
+    <string name="save_log">保存日志</string>
 </resources>
