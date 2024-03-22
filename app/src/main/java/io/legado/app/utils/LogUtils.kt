@@ -7,11 +7,13 @@ import io.legado.app.BuildConfig
 import io.legado.app.help.config.AppConfig
 import splitties.init.appCtx
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.logging.ConsoleHandler
 import java.util.logging.FileHandler
 import java.util.logging.Level
 import java.util.logging.LogRecord
 import java.util.logging.Logger
+import kotlin.time.Duration.Companion.days
 
 @SuppressLint("SimpleDateFormat")
 @Suppress("unused")
@@ -24,24 +26,38 @@ object LogUtils {
         logger.log(Level.INFO, "$tag $msg")
     }
 
+    inline fun d(tag: String, lazyMsg: () -> String) {
+        if (logger.isLoggable(Level.INFO)) {
+            logger.log(Level.INFO, "$tag ${lazyMsg()}")
+        }
+    }
+
     @JvmStatic
     fun e(tag: String, msg: String) {
         logger.log(Level.WARNING, "$tag $msg")
     }
 
-    private val logger: Logger by lazy {
+    val logger: Logger by lazy {
         Logger.getGlobal().apply {
             fileHandler?.let {
                 addHandler(it)
             }
+            addHandler(consoleHandler)
         }
     }
 
     private val fileHandler by lazy {
         val root = appCtx.externalCacheDir ?: return@lazy null
         val logFolder = FileUtils.createFolderIfNotExist(root, "logs")
-        val logPath = FileUtils.getPath(root = logFolder, "appLog")
-        FileHandler(logPath, 10240, 10).apply {
+        val expiredTime = System.currentTimeMillis() - 7.days.inWholeMilliseconds
+        logFolder.listFiles()?.forEach {
+            if (it.lastModified() < expiredTime) {
+                it.delete()
+            }
+        }
+        val date = getCurrentDateStr(TIME_PATTERN)
+        val logPath = FileUtils.getPath(root = logFolder, "appLog-$date.txt")
+        FileHandler(logPath).apply {
             formatter = object : java.util.logging.Formatter() {
                 override fun format(record: LogRecord): String {
                     // 设置文件输出格式
@@ -53,15 +69,33 @@ object LogUtils {
             } else {
                 Level.OFF
             }
-        }
+        }.asynchronous()
+    }
+
+    private val consoleHandler by lazy {
+        ConsoleHandler().apply {
+            formatter = object : java.util.logging.Formatter() {
+                override fun format(record: LogRecord): String {
+                    // 设置文件输出格式
+                    return (getCurrentDateStr(TIME_PATTERN) + ": " + record.message + "\n")
+                }
+            }
+            level = if (AppConfig.recordLog) {
+                Level.INFO
+            } else {
+                Level.OFF
+            }
+        }.asynchronous()
     }
 
     fun upLevel() {
-        fileHandler?.level = if (AppConfig.recordLog) {
+        val level = if (AppConfig.recordLog) {
             Level.INFO
         } else {
             Level.OFF
         }
+        fileHandler?.level = level
+        consoleHandler.level = level
     }
 
     /**
