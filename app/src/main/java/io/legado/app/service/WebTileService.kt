@@ -1,16 +1,15 @@
 package io.legado.app.service
 
 import android.app.Dialog
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import android.view.WindowManager.BadTokenException
 import androidx.annotation.RequiresApi
-import androidx.core.os.postDelayed
 import io.legado.app.R
 import io.legado.app.constant.IntentAction
-import io.legado.app.utils.buildMainHandler
 import io.legado.app.utils.printOnDebug
 
 
@@ -19,8 +18,6 @@ import io.legado.app.utils.printOnDebug
  */
 @RequiresApi(Build.VERSION_CODES.N)
 class WebTileService : TileService() {
-
-    private val handler by lazy { buildMainHandler() }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
@@ -60,10 +57,12 @@ class WebTileService : TileService() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 val dialog = Dialog(this, R.style.AppTheme_Transparent)
                 dialog.setOnShowListener {
-                    WebService.startForeground(this)
-                    handler.postDelayed(1000) {
-                        dialog.dismiss()
+                    try {
+                        WebService.startForeground(this)
+                    } catch (e: ForegroundServiceStartNotAllowedException) {
+                        e.printStackTrace()
                     }
+                    dialog.dismiss()
                 }
                 try {
                     showDialog(dialog)
