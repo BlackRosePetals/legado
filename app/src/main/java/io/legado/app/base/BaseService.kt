@@ -33,7 +33,7 @@ abstract class BaseService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         LifecycleHelp.onServiceCreate(this)
-        checkNotificationPermission()
+        checkPermission()
     }
 
     @CallSuper
@@ -71,9 +71,9 @@ abstract class BaseService : LifecycleService() {
     }
 
     /**
-     * 检测通知权限
+     * 检测通知权限和后台权限
      */
-    private fun checkNotificationPermission() {
+    private fun checkPermission() {
         PermissionsCompat.Builder()
             .addPermissions(Permissions.POST_NOTIFICATIONS)
             .rationale(R.string.notification_permission_rationale)
@@ -82,6 +82,10 @@ abstract class BaseService : LifecycleService() {
                     startForegroundNotification()
                 }
             }
+            .request()
+        PermissionsCompat.Builder()
+            .addPermissions(Permissions.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            .rationale(R.string.ignore_battery_permission_rationale)
             .request()
     }
 }
