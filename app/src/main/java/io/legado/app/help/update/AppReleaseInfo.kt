@@ -1,6 +1,7 @@
 package io.legado.app.help.update
 
 import com.google.gson.annotations.SerializedName
+import io.legado.app.exception.NoStackTraceException
 import java.time.Instant
 
 data class AppReleaseInfo(
@@ -18,7 +19,12 @@ enum class AppVariant {
     OFFICIAL,
     BETA_RELEASEA,
     BETA_RELEASE,
-    UNKNOWN
+    UNKNOWN;
+
+    fun isBeta(): Boolean {
+        return this == BETA_RELEASE || this == BETA_RELEASEA
+    }
+
 }
 
 data class GithubRelease(
@@ -28,10 +34,10 @@ data class GithubRelease(
     val isPreRelease: Boolean,
 ) {
     fun gitReleaseToAppReleaseInfo(): List<AppReleaseInfo> {
+        assets ?: throw NoStackTraceException("获取新版本出错")
         return assets
-            ?.filter { it.isValid }
-            ?.map { it.assetToAppReleaseInfo(isPreRelease, body) }
-            .orEmpty()
+            .filter { it.isValid }
+            .map { it.assetToAppReleaseInfo(isPreRelease, body) }
     }
 }
 
