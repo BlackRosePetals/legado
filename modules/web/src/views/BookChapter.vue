@@ -301,7 +301,10 @@ const toChapterPos = (pos) => {
 };
 
 // 60秒保存一次进度
-const saveBookProgressThrottle = useThrottleFn(() => store.saveBookProgress(), 60000)
+const saveBookProgressThrottle = useThrottleFn(
+  () => store.saveBookProgress(),
+  60000,
+);
 
 const onReadedLengthChange = (index, pos) => {
   saveReadingBookProgressToBrowser(index, pos);
@@ -430,10 +433,7 @@ const handleKeyPress = (event) => {
       event.stopPropagation();
       event.preventDefault();
       if (document.documentElement.scrollTop === 0) {
-        ElMessage({
-          message: "已到达页面顶部",
-          type: "warn",
-        });
+        ElMessage.warning("已到达页面顶部");
       } else {
         canJump = false;
         jump(0 - document.documentElement.clientHeight + 100, {
@@ -450,10 +450,7 @@ const handleKeyPress = (event) => {
           document.documentElement.scrollTop ===
         document.documentElement.scrollHeight
       ) {
-        ElMessage({
-          message: "已到达页面底部",
-          type: "warn",
-        });
+        ElMessage.warning("已到达页面底部");
       } else {
         canJump = false;
         jump(document.documentElement.clientHeight - 100, {
@@ -491,7 +488,7 @@ onMounted(() => {
       bookAuthor: bookAuthor,
       bookUrl: bookUrl,
       index: chapterIndex,
-      chapterPos: chapterPos
+      chapterPos: chapterPos,
     };
     localStorage.setItem(bookUrl, JSON.stringify(book));
   }
@@ -531,7 +528,6 @@ onMounted(() => {
   );
 });
 
-
 onUnmounted(() => {
   window.removeEventListener("keyup", handleKeyPress);
   window.removeEventListener("keydown", ignoreKeyPress);
@@ -544,7 +540,6 @@ onUnmounted(() => {
   scrollObserver = null;
 });
 
-
 const addToBookShelfConfirm = async () => {
   const bookUrl = sessionStorage.getItem("bookUrl");
   const bookName = sessionStorage.getItem("bookName");
@@ -553,10 +548,12 @@ const addToBookShelfConfirm = async () => {
   sessionStorage.removeItem("isSeachBook");
   // 阅读的是搜索的书籍 并未在书架
   if (isSeachBook === "true") {
-    const addtoshelf = window.confirm(`是否将《${bookName}》放入书架？`)
+
+    const addtoshelf = window.confirm(`是否将《${bookName}》放入书架？`);
     if (!addtoshelf) await API.deleteBook(book);
-      //按下返回键时不能触发 ElMessageBox.confirm
-/*     await ElMessageBox.confirm(
+    
+/*      //按下返回键时不能触发 ElMessageBox.confirm
+         await ElMessageBox.confirm(
       `是否将《${bookName}》放入书架？`,
       "放入书架",
       {
@@ -571,7 +568,7 @@ const addToBookShelfConfirm = async () => {
       await API.deleteBook(book);
     }) */
   }
-}
+};
 onBeforeRouteLeave(async (to, from, next) => {
   await addToBookShelfConfirm();
   next();

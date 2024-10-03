@@ -52,7 +52,7 @@ export const useBookStore = defineStore("book", {
       };
     },
     theme: (state) => {
-      return state.config.theme
+      return state.config.theme;
     },
     isNight: (state) => state.config.theme == 6,
   },

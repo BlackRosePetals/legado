@@ -54,7 +54,7 @@ import SourceItem from "./SourceItem.vue";
 const store = useSourceStore();
 const sourceUrlSelect = ref([]);
 const searchKey = ref("");
-const sources  = computed(() => store.sources);
+const sources = computed(() => store.sources);
 
 // 筛选源
 /** @type Ref<import('@/source').Source[]> */
@@ -127,7 +127,7 @@ const importSourceFile = () => {
   input.click();
 };
 
-const isBookSource = /bookSource/.test(window.location.href);
+const isBookSource = /bookSource/i.test(window.location.href);
 const outExport = () => {
   const exportFile = document.createElement("a");
   let sources =
