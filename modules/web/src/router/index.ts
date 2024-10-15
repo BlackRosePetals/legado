@@ -11,4 +11,5 @@ const router = createRouter({
 router.afterEach(to => {
   if (to.name == 'shelf') document.title = '书架'
 })
+
 export default router
