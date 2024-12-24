@@ -341,6 +341,28 @@ class TextChapterLayout(
                     height = size.height * visibleWidth / size.width
                 }
 
+                Book.imgStyleSingle -> {
+                    width = visibleWidth
+                    height = size.height * visibleWidth / size.width
+                    if (height > visibleHeight) {
+                        width = width * visibleHeight / height
+                        height = visibleHeight
+                    }
+                    if (durY > 0f) {
+                        val textPage = pendingTextPage
+                        if (textPage.height < durY) {
+                            textPage.height = durY
+                        }
+                        textPage.text = stringBuilder.toString().ifEmpty { "本页无文字内容" }
+                        stringBuilder.clear()
+                        textPages.add(textPage)
+                        coroutineContext.ensureActive()
+                        onPageCompleted()
+                        pendingTextPage = TextPage()
+                        durY = 0f
+                    }
+                }
+
                 else -> {
                     if (size.width > visibleWidth) {
                         height = size.height * visibleWidth / size.width
