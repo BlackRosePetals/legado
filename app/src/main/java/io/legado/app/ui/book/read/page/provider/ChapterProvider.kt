@@ -359,7 +359,7 @@ object ChapterProvider {
             }
             var height = size.height
             var width = size.width
-            when (imageStyle?.toUpperCase(Locale.ROOT)) {
+            when (imageStyle?.uppercase(Locale.ROOT)) {
                 Book.imgStyleFull -> {
                     width = visibleWidth
                     height = size.height * visibleWidth / size.width
@@ -392,6 +392,18 @@ object ChapterProvider {
                             textPage.height = durY
                         }
                         durY = 0f
+                    }
+
+                    // 图片居中：调整 X 坐标
+                    if (width < visibleWidth) {
+                        val adjustWidth = (visibleWidth - width) / 2f
+                        absStartX += adjustWidth.toInt() // 将起始 X 坐标移至居中位置
+                    }
+
+                    // 图片竖直方向居中：调整 Y 坐标
+                    if (height < visibleHeight) {
+                        val adjustHeight = (visibleHeight - height) / 2f
+                        durY = adjustHeight // 将 Y 坐标设置为居中位置
                     }
                 }
                 
