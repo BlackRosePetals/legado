@@ -1,9 +1,8 @@
 package io.legado.app.help
 
+import android.content.Intent
 import android.net.Uri
 import android.webkit.WebSettings
-import android.app.AlertDialog
-import android.content.Intent
 import androidx.annotation.Keep
 import cn.hutool.core.codec.Base64
 import cn.hutool.core.util.HexUtil
@@ -48,11 +47,9 @@ import io.legado.app.utils.readText
 import io.legado.app.utils.stackTraceStr
 import io.legado.app.utils.toStringArray
 import io.legado.app.utils.toastOnUi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import okio.use
 import org.jsoup.Connection
 import org.jsoup.Jsoup
@@ -964,10 +961,22 @@ interface JsExtensions : JsEncodeUtils {
     }
 
     fun openUrl(url: String) {
+        openUrl(url, null)
+    }
+
+    // 新增 mimeType 参数，默认为 null（保持兼容性）
+    fun openUrl(url: String, mimeType: String? = null) {
         try {
             val intent = Intent(appCtx, ConfirmationDialogActivity::class.java).apply {
-                data = Uri.parse(url)
-                putExtra("sourceTag", getSource()?.getTag() ?: "") // 添加来源标签参数
+                // 同时设置 Data 和 Type（避免单独设置 data/type 导致冲突）
+                if (mimeType != null) {
+                    setDataAndType(Uri.parse(url), mimeType)
+                } else {
+                    data = Uri.parse(url)
+                }
+                putExtra("sourceTag", getSource()?.getTag() ?: "")
+                // 可选：添加 MIME 类型到 Extra 供后续逻辑使用
+                putExtra("mimeType", mimeType)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             appCtx.startActivity(intent)
@@ -976,4 +985,5 @@ interface JsExtensions : JsEncodeUtils {
             appCtx.toastOnUi("启动跳转确认失败")
         }
     }
+
 }
