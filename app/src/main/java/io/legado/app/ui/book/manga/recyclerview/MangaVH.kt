@@ -1,12 +1,10 @@
-package io.legado.app.model.recyclerView
+package io.legado.app.ui.book.manga.recyclerview
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ProgressBar
@@ -22,7 +20,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import io.legado.app.R
-import io.legado.app.help.glide.progress.OnProgressListener
 import io.legado.app.help.glide.progress.ProgressManager
 import io.legado.app.model.BookCover
 import io.legado.app.model.ReadManga
@@ -59,17 +56,10 @@ open class MangaVH<VB : ViewBinding>(val binding: VB, private val context: Conte
         mRetry?.isGone = true
         mProgress.isVisible = true
         ProgressManager.removeListener(imageUrl)
-        ProgressManager.addListener(imageUrl, object : OnProgressListener {
+        ProgressManager.addListener(imageUrl) { _, percentage, _, _ ->
             @SuppressLint("SetTextI18n")
-            override fun invoke(
-                isComplete: Boolean,
-                percentage: Int,
-                bytesRead: Long,
-                totalBytes: Long,
-            ) {
-                mProgress.text = "$percentage%"
-            }
-        })
+            mProgress.text = "$percentage%"
+        }
         try {
             mImage.tag = imageUrl
             BookCover.loadManga(
@@ -90,7 +80,7 @@ open class MangaVH<VB : ViewBinding>(val binding: VB, private val context: Conte
                     mRetry?.isVisible = true
                     mProgress.isGone = true
                     itemView.updateLayoutParams<ViewGroup.LayoutParams> {
-                        height = MATCH_PARENT
+                        height = ViewGroup.LayoutParams.MATCH_PARENT
                     }
                     return false
                 }
@@ -105,7 +95,7 @@ open class MangaVH<VB : ViewBinding>(val binding: VB, private val context: Conte
                     mFlProgress.isGone = true
                     if (!isHorizontal) {
                         itemView.updateLayoutParams<ViewGroup.LayoutParams> {
-                            height = WRAP_CONTENT
+                            height = ViewGroup.LayoutParams.WRAP_CONTENT
                         }
                     } else {
                         mImage.updateLayoutParams<FrameLayout.LayoutParams> {

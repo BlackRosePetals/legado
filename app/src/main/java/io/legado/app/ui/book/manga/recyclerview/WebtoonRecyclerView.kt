@@ -1,4 +1,4 @@
-package io.legado.app.ui.book.manga.rv
+package io.legado.app.ui.book.manga.recyclerview
 
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
@@ -48,8 +48,8 @@ class WebtoonRecyclerView @JvmOverloads constructor(
     var disableMangaScaling = false
     var disabledClickScroller = false
 
-    private var mToucheMiddle: (() -> Unit)? = null
-    fun onToucheMiddle(init: () -> Unit) = apply { this.mToucheMiddle = init }
+    private var mTouchMiddle: (() -> Unit)? = null
+    fun onTouchMiddle(init: () -> Unit) = apply { this.mTouchMiddle = init }
     private var mNextPage: (() -> Unit)? = null
     fun onNextPage(init: () -> Unit) = apply { this.mNextPage = init }
     private var mPrevPage: (() -> Unit)? = null
@@ -252,7 +252,7 @@ class WebtoonRecyclerView @JvmOverloads constructor(
         override fun onSingleTapConfirmed(ev: MotionEvent): Boolean {
             when {
                 mcRect.contains(ev.rawX, ev.rawY) -> {
-                    mToucheMiddle?.invoke()
+                    mTouchMiddle?.invoke()
                 }
 
                 blRect.contains(ev.rawX, ev.rawY) && !disabledClickScroller -> {

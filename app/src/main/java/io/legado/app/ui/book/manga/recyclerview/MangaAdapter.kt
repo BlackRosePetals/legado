@@ -1,4 +1,4 @@
-package io.legado.app.ui.book.manga.rv
+package io.legado.app.ui.book.manga.recyclerview
 
 import android.content.Context
 import android.util.SparseArray
@@ -22,9 +22,8 @@ import io.legado.app.databinding.BookComicRvBinding
 import io.legado.app.help.glide.progress.ProgressManager
 import io.legado.app.model.BookCover
 import io.legado.app.model.ReadManga
-import io.legado.app.model.recyclerView.MangaContent
-import io.legado.app.model.recyclerView.MangaVH
-import io.legado.app.model.recyclerView.ReaderLoading
+import io.legado.app.ui.book.manga.entities.MangaContent
+import io.legado.app.ui.book.manga.entities.ReaderLoading
 import io.legado.app.utils.getCompatDrawable
 import java.util.Collections
 
@@ -59,9 +58,13 @@ class MangaAdapter(private val context: Context) :
 
     private val mDiffer = AsyncListDiffer(this, mDiffCallback)
 
-    private fun getItem(@IntRange(from = 0) position: Int) = mDiffer.currentList[position]
+    fun getItem(@IntRange(from = 0) position: Int) = mDiffer.currentList.getOrNull(position)
 
     fun getCurrentList() = mDiffer.currentList
+
+    fun isEmpty() = mDiffer.currentList.isEmpty()
+
+    fun isNotEmpty() = !isEmpty()
 
     //全部替换数据
     fun submitList(contents: MutableList<Any>, runnable: Runnable) {
