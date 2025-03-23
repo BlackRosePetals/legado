@@ -98,7 +98,7 @@ object ReadManga : CoroutineScope by MainScope() {
             chapterSize
         }
 
-        if (durChapterIndex != book.durChapterIndex || tocChanged) {
+        if (durChapterIndex != book.durChapterIndex) {
             durChapterIndex = book.durChapterIndex
             durChapterPos = book.durChapterPos
             clearMangaChapter()
@@ -547,6 +547,9 @@ object ReadManga : CoroutineScope by MainScope() {
                 durChapterIndex = simulatedChapterSize - 1
             }
             clearMangaChapter()
+            if (mCallback != null) {
+                loadContent()
+            }
         }
     }
 
