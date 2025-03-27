@@ -14,6 +14,7 @@ import io.legado.app.data.entities.RssArticle
 import io.legado.app.help.CacheManager
 import io.legado.app.help.JsExtensions
 import io.legado.app.help.http.CookieStore
+import io.legado.app.help.source.getShareScope
 import io.legado.app.model.webBook.WebBook
 import io.legado.app.utils.GSON
 import io.legado.app.utils.NetworkUtils
@@ -748,7 +749,7 @@ class AnalyzeRule(
             bindings["rssArticle"] = rssArticle
         }
         val scope = RhinoScriptEngine.getRuntimeScope(bindings)
-        source?.getShareScope()?.let {
+        source?.getShareScope(coroutineContext)?.let {
             scope.prototype = it
         }
         return RhinoScriptEngine.eval(jsStr, scope, coroutineContext)
@@ -815,7 +816,7 @@ class AnalyzeRule(
         if (bookSource == null || book == null) return
         runBlocking(coroutineContext) {
             withTimeout(1800000) {
-                WebBook.getBookInfoAwait(bookSource, book)
+                WebBook.getBookInfoAwait(bookSource, book, false)
             }
         }
     }
@@ -829,7 +830,7 @@ class AnalyzeRule(
         if (bookSource == null || book == null) return
         runBlocking(coroutineContext) {
             withTimeout(1800000) {
-                WebBook.getBookInfoAwait(bookSource, book)
+                WebBook.getBookInfoAwait(bookSource, book, false)
             }
         }
     }
