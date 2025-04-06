@@ -48,6 +48,7 @@
 # 这个过滤器是谷歌推荐的算法，一般不做更改
 -optimizations !code/simplification/cast,!field/*,!class/merging/*
 
+-flattenpackagehierarchy
 
 #############################################
 #
@@ -57,55 +58,10 @@
 # 屏蔽错误Unresolved class name
 #noinspection ShrinkerUnresolvedReference
 
-# 保留我们使用的四大组件，自定义的Application等等这些类不被混淆
-# 因为这些子类都有可能被外部调用
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Application
--keep public class * extends android.app.Service
--keep public class * extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
--keep public class * extends android.app.backup.BackupAgentHelper
--keep public class * extends android.preference.Preference
--keep public class * extends android.view.View
-
-# 保留androidx下的所有类及其内部类
--keep class androidx.** {*;}
-
-# 保留继承的
--keep public class * extends androidx.**
-
-# 保留R下面的资源
--keep class **.R$* {*;}
-
-# 保留本地native方法不被混淆
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-
-# 保留在Activity中的方法参数是view的方法，
-# 这样以来我们在layout中写的onClick就不会被影响
--keepclassmembers class * extends android.app.Activity{
-    public void *(android.view.View);
-}
-
 # 保留枚举类不被混淆
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
-}
-
-# 保留我们自定义控件（继承自View）不被混淆
--keep public class * extends android.view.View{
-    *** get*();
-    void set*(***);
-    public <init>(android.content.Context);
-    public <init>(android.content.Context, android.util.AttributeSet);
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-}
-
-# 保留Parcelable序列化类不被混淆
--keep class * implements android.os.Parcelable {
-    public static final android.os.Parcelable$Creator *;
 }
 
 # 保留Serializable序列化的类不被混淆
@@ -127,13 +83,6 @@
     void *(**On*Listener);
 }
 
-# webView处理，项目中没有使用到webView忽略即可
--keepclassmembers class * extends android.webkit.WebViewClient {
-    public void *(android.webkit.WebView, java.lang.String);
-    public void *(android.webkit.WebView, java.lang.String, android.graphics.Bitmap);
-    public boolean *(android.webkit.WebView, java.lang.String);
-}
-
 # 移除Log类打印各个等级日志的代码，打正式包的时候可以做为禁log使用，这里可以作为禁止log打印的功能使用
 # 记得proguard-android.txt中一定不要加-dontoptimize才起作用
 # 另外的一种实现方案是通过BuildConfig.DEBUG的变量来控制
@@ -147,24 +96,17 @@
 
 # 保持js引擎调用的java类
 -keep class * extends io.legado.app.help.JsExtensions{*;}
--keep class * extends io.legado.app.model.analyzeRule.RuleDataInterface{*;}
-# 保持web类
--keep class **.web.**{*;}
 # 数据类
--keep class **.data.**{*;}
+-keep class **.data.entities.**{*;}
 # hutool-core hutool-crypto
 -keep class
-!cn.hutool.core.io.**,
-!cn.hutool.core.bean.**,
-!cn.hutool.core.lang.reflect.**,
-!cn.hutool.core.lang.JarClassLoader,
-!cn.hutool.core.lang.Singleton,
 !cn.hutool.core.util.RuntimeUtil,
 !cn.hutool.core.util.ClassLoaderUtil,
 !cn.hutool.core.util.ReflectUtil,
 !cn.hutool.core.util.SerializeUtil,
 !cn.hutool.core.util.ClassUtil,
-cn.hutool.core.**{*;}
+cn.hutool.core.codec.**,
+cn.hutool.core.util.**{*;}
 -keep class cn.hutool.crypto.**{*;}
 -dontwarn cn.hutool.**
 # 缓存 Cookie
@@ -183,18 +125,15 @@ cn.hutool.core.**{*;}
 -dontwarn com.hwangjr.rxbus.**
 -dontwarn okhttp3.**
 -dontwarn org.conscrypt.**
--dontwarn com.jeremyliao.liveeventbus.**
 -dontwarn org.commonmark.ext.gfm.**
 
 -keep,allowobfuscation,allowshrinking class com.google.gson.** { *; }
 -keep,allowobfuscation,allowshrinking class com.ke.gson.** { *; }
 -keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
--keep class com.jeremyliao.liveeventbus.** { *; }
 -keep class okhttp3.**{*;}
 -keep class okio.**{*;}
 -keep class com.hwangjr.rxbus.**{*;}
 -keep class org.conscrypt.**{*;}
--keep class android.support.**{*;}
 -keep class me.grantland.widget.**{*;}
 -keep class de.hdodenhof.circleimageview.**{*;}
 -keep class tyrant.explosionfield.**{*;}
@@ -202,69 +141,24 @@ cn.hutool.core.**{*;}
 -keep class freemarker.**{*;}
 -keep class com.gyf.barlibrary.** {*;}
 
+# LiveEventBus
+-keepclassmembers class androidx.lifecycle.LiveData {
+    *** mObservers;
+    *** mActiveCount;
+}
+-keepclassmembers class androidx.arch.core.internal.SafeIterableMap {
+    *** size();
+    *** putIfAbsent(...);
+}
+
+## ChangeBookSourceDialog initNavigationView
+-keepclassmembers class androidx.appcompat.widget.Toolbar {
+    *** mNavButtonView;
+}
+
 ## JSOUP
 -keep class org.jsoup.**{*;}
--keep class **.xpath.**{*;}
 -dontwarn org.jspecify.annotations.NullMarked
-
--keep class org.slf4j.**{*;}
--dontwarn org.slf4j.**
-
--keep class org.codehaus.**{*;}
--dontwarn org.codehaus.**
--keep class com.jayway.**{*;}
--dontwarn com.jayway.**
--keep class com.fasterxml.**{*;}
-
--keep class javax.swing.**{*;}
--dontwarn javax.swing.**
--keep class java.awt.**{*;}
--dontwarn java.awt.**
--keep class sun.misc.**{*;}
--dontwarn sun.misc.**
--keep class sun.reflect.**{*;}
--dontwarn sun.reflect.**
-
-## Rhino
--keep class com.script.** { *; }
--keep class javax.script.** { *; }
--keep class java.lang.** { *; }
--keep class java.util.function.** { *; }
--keep class com.sun.script.javascript.** { *; }
--keep class org.mozilla.** { *; }
--dontwarn org.mozilla.javascript.engine.RhinoScriptEngineFactory
-### 以下内容是更新rhino1.7.14.jar后IDE提示添加的
--dontwarn java.beans.**
--dontwarn javax.script.**
-### 以下内容是更新rhino1.8.0.jar后IDE提示添加的
--dontwarn jdk.dynalink.CallSiteDescriptor
--dontwarn jdk.dynalink.DynamicLinker
--dontwarn jdk.dynalink.DynamicLinkerFactory
--dontwarn jdk.dynalink.NamedOperation
--dontwarn jdk.dynalink.Namespace
--dontwarn jdk.dynalink.NamespaceOperation
--dontwarn jdk.dynalink.Operation
--dontwarn jdk.dynalink.RelinkableCallSite
--dontwarn jdk.dynalink.StandardNamespace
--dontwarn jdk.dynalink.StandardOperation
--dontwarn jdk.dynalink.linker.GuardedInvocation
--dontwarn jdk.dynalink.linker.GuardingDynamicLinker
--dontwarn jdk.dynalink.linker.LinkRequest
--dontwarn jdk.dynalink.linker.LinkerServices
--dontwarn jdk.dynalink.linker.TypeBasedGuardingDynamicLinker
--dontwarn jdk.dynalink.linker.support.CompositeTypeBasedGuardingDynamicLinker
--dontwarn jdk.dynalink.linker.support.Guards
--dontwarn jdk.dynalink.support.ChainedCallSite
-
-## EPUB
--dontwarn nl.siegmann.epublib.**
--dontwarn org.xmlpull.**
--keep class nl.siegmann.epublib.**{*;}
--keep class javax.xml.**{*;}
--keep class org.xmlpull.**{*;}
-
--keep class org.simpleframework.**{*;}
--dontwarn org.simpleframework.xml.**
 
 -keepclassmembers class * {
     public <init> (org.json.JSONObject);
@@ -284,9 +178,6 @@ cn.hutool.core.**{*;}
 ## 对外提供api
 -keep class io.legado.app.api.ReturnData{*;}
 
-# 繁简转换
--keep class com.github.liuyueyi.quick.transfer.** {*;}
-
 # Cronet
 -keepclassmembers class org.chromium.net.X509Util {
     *** sDefaultTrustManager;
@@ -299,6 +190,6 @@ cn.hutool.core.**{*;}
 -keep class io.legado.app.help.update.AppUpdateGitHub{*;}
 -keep class io.legado.app.help.AppIntentType{*;}
 # Error Exception 
--keep class * extends java.lang.Exception
--keep class * extends java.lang.Error
--keep class **Exception
+-keepnames class * extends java.lang.Exception
+-keepnames class * extends java.lang.Error
+-keepnames class **Exception
