@@ -10,6 +10,7 @@ import io.legado.app.help.book.BookHelp
 import io.legado.app.help.source.getBookType
 import io.legado.app.model.Debug
 import io.legado.app.model.analyzeRule.AnalyzeRule
+import io.legado.app.model.analyzeRule.AnalyzeRule.Companion.setCoroutineContext
 import io.legado.app.model.analyzeRule.AnalyzeUrl
 import io.legado.app.model.analyzeRule.RuleData
 import io.legado.app.utils.HtmlFormatter
@@ -60,7 +61,8 @@ object BookList {
                     body,
                     baseUrl,
                     ruleData.getVariable(),
-                    isRedirect
+                    isRedirect,
+                    filter
                 )?.let { searchBook ->
                     searchBook.infoHtml = body
                     bookList.add(searchBook)
@@ -90,7 +92,7 @@ object BookList {
             Debug.log(bookSource.bookSourceUrl, "└列表为空,按详情页解析")
             getInfoItem(
                 bookSource, analyzeRule, analyzeUrl, body, baseUrl, ruleData.getVariable(),
-                isRedirect
+                isRedirect, filter
             )?.let { searchBook ->
                 searchBook.infoHtml = body
                 bookList.add(searchBook)
@@ -147,7 +149,8 @@ object BookList {
         body: String,
         baseUrl: String,
         variable: String?,
-        isRedirect: Boolean
+        isRedirect: Boolean,
+        filter: ((name: String, author: String) -> Boolean)?
     ): SearchBook? {
         val book = Book(variable = variable)
         book.bookUrl = if (isRedirect) {
@@ -169,6 +172,9 @@ object BookList {
             baseUrl,
             false
         )
+        if (filter?.invoke(book.name, book.author) == false) {
+            return null
+        }
         if (book.name.isNotBlank()) {
             return book.toSearchBook()
         }
@@ -183,7 +189,7 @@ object BookList {
         baseUrl: String,
         variable: String?,
         log: Boolean,
-        filter: ((name: String, author: String) -> Boolean)? = null,
+        filter: ((name: String, author: String) -> Boolean)?,
         ruleName: List<AnalyzeRule.SourceRule>,
         ruleBookUrl: List<AnalyzeRule.SourceRule>,
         ruleAuthor: List<AnalyzeRule.SourceRule>,
