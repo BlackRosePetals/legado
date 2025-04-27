@@ -505,15 +505,6 @@ interface JsExtensions : JsEncodeUtils {
         return dateFormat.format(Date(time))
     }
 
-    /**
-     * utf8编码转gbk编码
-     */
-    fun utf8ToGbk(str: String): String {
-        val utf8 = String(str.toByteArray(charset("UTF-8")))
-        val unicode = String(utf8.toByteArray(), charset("UTF-8"))
-        return String(unicode.toByteArray(charset("GBK")))
-    }
-
     fun encodeURI(str: String): String {
         return try {
             URLEncoder.encode(str, "UTF-8")
@@ -862,6 +853,7 @@ interface JsExtensions : JsEncodeUtils {
     ): String {
         if (errorQueryTTF == null || correctQueryTTF == null) return text
         val contentArray = text.toStringArray() //这里不能用toCharArray,因为有些文字占多个字节
+        val intArray = IntArray(1)
         contentArray.forEachIndexed { index, s ->
             val oldCode = s.codePointAt(0)
             // 忽略正常的空白字符
@@ -878,7 +870,8 @@ interface JsExtensions : JsEncodeUtils {
             // 使用轮廓数据反查Unicode
             val code = correctQueryTTF.getUnicodeByGlyf(glyf)
             if (code != 0) {
-                contentArray[index] = code.toChar().toString()
+                intArray[0] = code
+                contentArray[index] = String(intArray, 0, 1)
             }
         }
         return contentArray.joinToString("")
