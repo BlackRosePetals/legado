@@ -38,6 +38,7 @@ import io.legado.app.help.http.newCallStrResponse
 import io.legado.app.help.http.postForm
 import io.legado.app.help.http.postJson
 import io.legado.app.help.http.postMultipart
+import io.legado.app.help.source.copy
 import io.legado.app.help.source.getShareScope
 import io.legado.app.model.Debug
 import io.legado.app.utils.EncoderUtils
@@ -75,11 +76,11 @@ import kotlin.math.max
 @Keep
 @SuppressLint("DefaultLocale")
 class AnalyzeUrl(
-    val mUrl: String,
-    val key: String? = null,
-    val page: Int? = null,
-    val speakText: String? = null,
-    val speakSpeed: Int? = null,
+    private val mUrl: String,
+    private val key: String? = null,
+    private val page: Int? = null,
+    private val speakText: String? = null,
+    private val speakSpeed: Int? = null,
     private var baseUrl: String = "",
     private val source: BaseSource? = null,
     private val ruleData: RuleDataInterface? = null,
@@ -95,11 +96,10 @@ class AnalyzeUrl(
         private set
     var url: String = ""
         private set
-    var body: String? = null
-        private set
     var type: String? = null
         private set
     val headerMap = LinkedHashMap<String, String>()
+    private var body: String? = null
     private var urlNoQuery: String = ""
     private var encodedForm: String? = null
     private var encodedQuery: String? = null
@@ -357,7 +357,7 @@ class AnalyzeUrl(
             bindings["speakText"] = speakText
             bindings["speakSpeed"] = speakSpeed
             bindings["book"] = ruleData as? Book
-            bindings["source"] = source
+            bindings["source"] = source?.copy()
             bindings["result"] = result
         }
         val sharedScope = source?.getShareScope(coroutineContext)
@@ -660,7 +660,7 @@ class AnalyzeUrl(
     }
 
     override fun getSource(): BaseSource? {
-        return source
+        return source?.copy()
     }
 
     companion object {
